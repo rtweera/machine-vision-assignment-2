@@ -5,13 +5,13 @@ TURF_PATH = "assets/turf.jpg"
 FLAG_PATH = "assets/flag.png"
 OUTPUT_PATH = "output/turf_with_flag.jpg"
 
-ALPHA = 0.50           # overall alpha blend; 0 = turf only, 1 = flag only
+ALPHA = 0.30           # overall alpha blend; 0 = turf only, 1 = flag only
 FEATHER = 31           # edge softness (odd number)
 ROTATE_FLAG_K = 1      # 0=no rotate, 1=90° CW, 2=180, 3=270 CW
 
-SAT_SCALE = 0.50       # <1 makes it less "neon"
-VAL_SCALE = 0.80      # <1 slightly darker
-TEXTURE_MIX = 1     # how much turf texture imprints on the flag [0..1]
+SAT_SCALE = 0.70       # <1 makes it less "neon"
+VAL_SCALE = 0.80       # <1 slightly darker
+TEXTURE_MIX = 1        # how much turf texture imprints on the flag [0..1]
 GAUSS_BLUR = 5         # small blur on warped flag to blend into scene
 
 
@@ -105,7 +105,7 @@ def overlay_flag_realistic(turf, flag, dst_quad,
     mod = (1.0 + texture_mix * texture)[:, :, None] # modulate value for brightness; make 3 channel
     warped_flag_f = np.clip(warped_flag_f * mod, 0, 1)
 
-    # ---- final alpha blend only in masked region ----
+    # final alpha blend only in masked region
     turf_f = turf.astype(np.float32) / 255.0
     out = turf_f * (1 - alpha*m) + warped_flag_f * (alpha*m)    # apply mask to make realistic.
     out = np.clip(out * 255.0, 0, 255).astype(np.uint8)
@@ -163,9 +163,9 @@ def main():
     cv2.imwrite(OUTPUT_PATH, result)
     print(f"Saved: {OUTPUT_PATH}")
 
-    cv2.namedWindow("Result (realistic)", cv2.WINDOW_NORMAL)
-    cv2.resizeWindow("Result (realistic)", 1200, 800)  # resizable output window
-    cv2.imshow("Result (realistic)", result)
+    cv2.namedWindow("Result", cv2.WINDOW_NORMAL)
+    cv2.resizeWindow("Result", 1200, 800)  # resizable output window
+    cv2.imshow("Result", result)
     cv2.waitKey(0)
     cv2.destroyAllWindows()
 
