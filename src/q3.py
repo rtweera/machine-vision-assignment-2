@@ -3,16 +3,16 @@ import numpy as np
 
 TURF_PATH = "assets/turf.jpg"
 FLAG_PATH = "assets/flag.png"
-OUTPUT_PATH = "reports/turf_with_flag.jpg"
+OUTPUT_PATH = "output/turf_with_flag.jpg"
 
-ALPHA = 0.80           # overall alpha blend
+ALPHA = 0.50           # overall alpha blend; 0 = turf only, 1 = flag only
 FEATHER = 31           # edge softness (odd number)
 ROTATE_FLAG_K = 1      # 0=no rotate, 1=90° CW, 2=180, 3=270 CW
 
-SAT_SCALE = 0.85       # <1 makes it less "neon"
-VAL_SCALE = 0.98       # <1 slightly darker
-TEXTURE_MIX = 0.35     # how much turf texture imprints on the flag [0..1]
-GAUSS_BLUR = 3         # small blur on warped flag to blend into scene
+SAT_SCALE = 0.50       # <1 makes it less "neon"
+VAL_SCALE = 0.80      # <1 slightly darker
+TEXTURE_MIX = 1     # how much turf texture imprints on the flag [0..1]
+GAUSS_BLUR = 5         # small blur on warped flag to blend into scene
 
 
 points = []
@@ -56,8 +56,8 @@ def make_flag_less_saturated(flag_bgr, sat_scale=0.85, val_scale=0.98):
 
 
 def overlay_flag_realistic(turf, flag, dst_quad,
-                           alpha=0.8, feather=31,
-                           texture_mix=0.35, gauss_blur=3):
+                           alpha, feather,
+                           texture_mix, gauss_blur):
     """ 
     Overlay the flag onto the turf with a perspective warp defined by dst_quad (4 corners in TL,TR,BR,BL order).
     The flag is blended using alpha blending, with optional feathering at the edges and modulation by the turf texture for realism.
