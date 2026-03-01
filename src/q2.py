@@ -114,7 +114,7 @@ def measure_and_print(image_path: str, show_plot: bool = True):
     if len(results) == 2:
         avg_w = (results[0][0] + results[1][0]) / 2
         avg_h = (results[0][1] + results[1][1]) / 2
-        avg_diameter = np.sqrt(avg_w**2 + avg_h**2)
+        avg_diameter = (avg_w + avg_h) / 2 
         print("\nAverage earring size (mm) from the two boxes:")
         print(f"  avg width  = {avg_w:.2f} mm")
         print(f"  avg height = {avg_h:.2f} mm")
