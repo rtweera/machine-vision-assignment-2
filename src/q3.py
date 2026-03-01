@@ -4,13 +4,12 @@ import numpy as np
 TURF_PATH = "assets/turf.jpg"
 FLAG_PATH = "assets/flag.png"
 
-ALPHA = 0.80           # overall paint strength (lower = more grass shows)
+ALPHA = 0.80           # overall alpha blend
 FEATHER = 31           # edge softness (odd number)
 ROTATE_FLAG_K = 1      # 0=no rotate, 1=90° CW, 2=180, 3=270 CW
 
-# ---- optional realism knobs ----
 SAT_SCALE = 0.85       # <1 makes it less "neon"
-VAL_SCALE = 0.98       # <1 slightly darker``
+VAL_SCALE = 0.98       # <1 slightly darker
 TEXTURE_MIX = 0.35     # how much turf texture imprints on the flag [0..1]
 GAUSS_BLUR = 3         # small blur on warped flag to blend into scene
 
@@ -20,8 +19,9 @@ img_display = None
 
 
 def mouse_callback(event, x, y, flags, param):
+    """ Mouse callback to collect 4 corner points on the image. Left-click to add points, R to reset last point. """
     global points, img_display
-    if event == cv2.EVENT_LBUTTONDOWN and len(points) < 4:
+    if event == cv2.EVENT_LBUTTONDOWN and len(points) < 4 and img_display is not None:
         points.append((x, y))
         print(f"Point {len(points)}: ({x}, {y})")
         cv2.circle(img_display, (x, y), 6, (0, 0, 255), -1)
@@ -31,25 +31,11 @@ def mouse_callback(event, x, y, flags, param):
 
 
 def order_points_by_angle(pts):
+    """ Order 4 points in TL, TR, BR, BL order by sorting based on angle from centroid."""
     pts = np.array(pts, dtype=np.float32)
     c = pts.mean(axis=0)
-
     angles = np.arctan2(pts[:,1] - c[1], pts[:,0] - c[0])
-    pts = pts[np.argsort(angles)]  # CCW
-
-    # rotate so TL first (min x+y)
-    s = pts[:,0] + pts[:,1]
-    pts = np.roll(pts, -np.argmin(s), axis=0)
-
-    # enforce clockwise
-    area2 = 0
-    for i in range(4):
-        x1,y1 = pts[i]
-        x2,y2 = pts[(i+1)%4]
-        area2 += (x1*y2 - x2*y1)
-    if area2 > 0:  # CCW
-        pts = pts[[0,3,2,1]]
-
+    pts = pts[np.argsort(angles)]  # CCW; consider centroid as origin and sort by angle asc to get TL, TR, BR, BL in CCW order
     return pts
 
 
