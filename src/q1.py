@@ -128,11 +128,11 @@ for i, L in enumerate(lines):
 fig, axes = plt.subplots(1, 2, figsize=(14,6))
 
 # ---- Left: TLS ----
-axes[0].scatter(pts1[:,0], pts1[:,1], color="blue", label="Line 1 Data Points")
+axes[0].scatter(pts1[:,0], pts1[:,1], color="blue", label="Data Points")
 xs = np.linspace(pts1[:,0].min()-1, pts1[:,0].max()+1, 200)
 ys = (-line_tls[0]*xs - line_tls[2]) / line_tls[1]
-axes[0].plot(xs, ys, color="blue", label="Line 1")
-axes[0].set_title("(a) Total Least Squares - First Line")
+axes[0].plot(xs, ys, color="blue", label="Line")
+axes[0].set_title("(a) Total Least Squares - Single Line")
 axes[0].set_xlabel("x")
 axes[0].set_ylabel("y")
 axes[0].axis("equal")
@@ -141,7 +141,7 @@ axes[0].grid(True)
 
 # ---- Right: RANSAC ----
 remaining = np.ones(len(points_all), dtype=bool)    # start with all points as remaining, then we will mark inliers to each line and remove them from remaining
-colors = ["blue","orange","green"]
+colors = ["green","orange","blue"]
 
 for i, m in enumerate(masks):
     remaining &= ~m # Mask out the inliers of the current line from the remaining points for the next iteration
@@ -151,7 +151,7 @@ if remaining.any(): # if there are any points left that were not inliers to any 
     axes[1].scatter(points_all[remaining,0], points_all[remaining,1], color="red", marker="x", label="Outliers")
 
 xs = np.linspace(points_all[:,0].min()-1, points_all[:,0].max()+1, 200)
-for L in lines:
+for i, L in enumerate(lines):
     if abs(L[1]) > 1e-12:   # if b is not too small (avoid division by zero), we can plot as y = mx + k; else we plot as x = constant
         ys = (-L[0]*xs - L[2]) / L[1]
         axes[1].plot(xs, ys, label=f"Line {i+1}")
