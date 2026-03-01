@@ -1,7 +1,11 @@
 import numpy as np
 import matplotlib.pyplot as plt
+from typing import Any
 
-def fit_line_tls(x, y):
+def fit_line_tls(
+        x: np.ndarray[tuple[Any], np.dtype[np.float64]], 
+        y: np.ndarray[tuple[Any], np.dtype[np.float64]]
+    ) -> np.ndarray[tuple[Any], np.dtype[np.float64]]:
     pts = np.column_stack([x, y])
     mu = pts.mean(axis=0)
     centered = pts - mu
@@ -11,7 +15,10 @@ def fit_line_tls(x, y):
     c = -(a * mu[0] + b * mu[1])
     return np.array([a, b, c])
 
-def line_from_two_points(p1, p2):
+def line_from_two_points(
+        p1: np.ndarray[tuple[Any, Any], np.dtype[np.float64]], 
+        p2: np.ndarray[tuple[Any, Any], np.dtype[np.float64]]
+    ) -> np.ndarray[tuple[Any], np.dtype[np.float64]]:
     x1, y1 = p1
     x2, y2 = p2
     a = y1 - y2
@@ -19,11 +26,28 @@ def line_from_two_points(p1, p2):
     c = x1*y2 - x2*y1
     return np.array([a, b, c]) / np.hypot(a, b)
 
-def point_line_dist(line, pts):
+def point_line_dist(
+        line: np.ndarray[tuple[Any], np.dtype[np.float64]], 
+        pts: np.ndarray[tuple[Any, Any], np.dtype[np.float64]]
+    ) -> np.ndarray[tuple[Any], np.dtype[np.float64]]:
     a, b, c = line
     return np.abs(a*pts[:,0] + b*pts[:,1] + c)
 
-def ransac_fit_line(points, n_iters=4000, threshold=0.25, min_inliers=35, seed=0):
+def abc_to_slope(
+        line: np.ndarray[tuple[Any], np.dtype[np.float64]]
+    ) -> str:
+    a, b, c = line
+    if abs(b) > 1e-12:
+        m = -a / b
+        k = -c / b
+        return f"y = {m:.6f}x + {k:.6f}"
+    else:
+        return f"x = {-c/a:.6f}"
+
+def ransac_fit_line(
+        points: np.ndarray[tuple[Any, Any], np.dtype[np.float64]], 
+        n_iters=4000, threshold=0.25, min_inliers=35, seed=0
+    ) -> tuple[np.ndarray, np.ndarray | None]:
     rng = np.random.default_rng(seed)
     best_line = None
     best_inliers = None
@@ -46,7 +70,9 @@ def ransac_fit_line(points, n_iters=4000, threshold=0.25, min_inliers=35, seed=0
     refined = fit_line_tls(inlier_pts[:,0], inlier_pts[:,1])
     return refined, best_inliers
 
-def fit_three_lines(points):
+def fit_three_lines(
+        points: np.ndarray[tuple[Any, Any], np.dtype[np.float64]]
+    ) -> tuple[list[np.ndarray], list[np.ndarray]]:
     remaining = np.arange(len(points))
     lines = []
     masks = []
@@ -65,17 +91,36 @@ def fit_three_lines(points):
     return lines, masks
 
 # === Data ===
-D = np.genfromtxt("data/lines.csv", delimiter=",", skip_header=1)
-X_cols = D[:, :3]
+D = np.genfromtxt("data/lines.csv", delimiter=",", skip_header=1)   # same as read_csv but better
+X_cols = D[:, :3]   # 2D array of shape (N,3) for x-coordinates of 3 lines
 Y_cols = D[:, 3:]
 
-x1 = X_cols[:,0]
+# === TLS for first line ===
+x1 = X_cols[:,0]    # get only first col 
 y1 = Y_cols[:,0]
 line_tls = fit_line_tls(x1, y1)
+
+print(f"\n{'='*30}")
+print("PART (a) - TLS (First Line)")
+print(f"{'='*30}")
+print("ax + by + c = 0 form:", line_tls)
+print("Slope form:", abc_to_slope(line_tls))
+
 pts1 = np.column_stack([x1, y1])
 
-points_all = np.column_stack([X_cols.flatten(), Y_cols.flatten()])
+# === RANSAC for three lines ===
+
+points_all = np.column_stack([X_cols.flatten(), Y_cols.flatten()])  # flattening because we want to treat all points together for RANSAC
 lines, masks = fit_three_lines(points_all)
+
+print(f"\n{'='*30}")
+print("PART (b) - RANSAC (Three Lines)")
+print(f"{'='*30}")
+
+for i, L in enumerate(lines):
+    print(f"\nLine {i+1}")
+    print("ax + by + c = 0 form:", L)
+    print("Slope form:", abc_to_slope(L))
 
 # === Plotting === 
 fig, axes = plt.subplots(1, 2, figsize=(14,6))
