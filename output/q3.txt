@@ -1,0 +1,11 @@
+Point 1: (687, 166)
+Point 2: (836, 163)
+Point 3: (1275, 629)
+Point 4: (176, 636)
+
+Ordered quad (TL,TR,BR,BL):
+ [[ 687.  166.]
+ [ 836.  163.]
+ [1275.  629.]
+ [ 176.  636.]]
+Saved: output/turf_with_flag.jpg

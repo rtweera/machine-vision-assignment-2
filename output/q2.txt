@@ -1,0 +1,17 @@
+=== Measurements (bounding box based) ===
+f = 8.0 mm, D = 720.0 mm, D' = 8.0899 mm, pixel = 2.2 um
+
+Earring 1:
+  bbox pixels (w,h) = (381, 395)
+  sensor size (mm)  = (0.8382, 0.8690)
+  object size (mm)  = (74.60, 77.34)
+
+Earring 2:
+  bbox pixels (w,h) = (382, 395)
+  sensor size (mm)  = (0.8404, 0.8690)
+  object size (mm)  = (74.80, 77.34)
+
+Average earring size (mm) from the two boxes:
+  avg width  = 74.70 mm
+  avg height = 77.34 mm
+  avg diameter = 76.02 mm
